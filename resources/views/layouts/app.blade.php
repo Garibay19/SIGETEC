@@ -116,6 +116,10 @@ href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.m
 
     }
 
+    .card-dashboard{
+        cursor: pointer;
+    }
+
     .icono{
 
         width:70px;
@@ -138,6 +142,24 @@ href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.m
 
         font-size:35px;
 
+    }
+
+    .table{
+        background:white;
+        border-radius:10px;
+        overflow:hidden;
+    }
+    
+    .table thead th{
+        background-color:#0b0b0b !important;
+        color:#d4af37 !important;
+        border-color:#0b0b0b !important;
+    }
+    
+    .table tbody tr:hover{
+        background-color:#fff3cd !important;
+        cursor:pointer;
+        transition:0.3s;
     }
 
 </style>

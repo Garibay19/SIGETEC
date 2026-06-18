@@ -139,7 +139,7 @@
 
         <label class="form-label">
 
-            Correo
+            Correo electronico
 
         </label>
 
@@ -149,7 +149,7 @@
 
         class="form-control"
 
-        placeholder="ejemplo@correo.com">
+        placeholder="correo@empresa.com">
 
     </div>
 
@@ -178,6 +178,17 @@
         Iniciar Sesión
 
     </button>
+
+    <div class="text-center mt-3">
+
+    <a href="#"
+    class="text-decoration-none">
+
+        ¿Olvidaste tu contraseña?
+
+    </a>
+
+</div>
 
 </form>
 

@@ -2,48 +2,159 @@
 
 @section('contenido')
 
-<h1>Nuevo Pago</h1>
+<div class="mb-4">
+
+<h1 style="font-weight:bold;">
+
+    <i class="bi bi-cash-stack"
+    style="color:#d4af37;"></i>
+
+    Nuevo Pago
+
+</h1>
+
+<p class="text-muted">
+
+    Registra un nuevo pago de un pedido.
+
+</p>
+
+</div>
 
 <div class="card">
-    <div class="card-body">
 
-        <form>
+<div class="card-body">
 
-            <div class="mb-3">
-                <label>Cliente</label>
-                <input type="text" class="form-control" placeholder="Nombre del cliente">
-            </div>
+    <form>
 
-            <div class="mb-3">
-                <label>Pedido</label>
-                <input type="text" class="form-control" placeholder="Pedido relacionado">
-            </div>
+        <div class="mb-3">
 
-            <div class="mb-3">
-                <label>Fecha de pago</label>
-                <input type="date" class="form-control">
-            </div>
+            <label class="form-label">
+                Cliente
+            </label>
 
-            <div class="mb-3">
-                <label>Monto pagado</label>
-                <input type="number" class="form-control" placeholder="Monto">
-            </div>
+            <input
+            type="text"
+            class="form-control"
+            placeholder="Nombre del cliente">
 
-            <div class="mb-3">
-                <label>Método de pago</label>
-                <select class="form-control">
-                    <option>Efectivo</option>
-                    <option>Transferencia</option>
-                    <option>Tarjeta</option>
-                </select>
-            </div>
+        </div>
 
-            <button class="btn btn-success">Guardar</button>
-            <a href="/pagos" class="btn btn-secondary">Cancelar</a>
+        <div class="mb-3">
 
-        </form>
+            <label class="form-label">
+                Pedido
+            </label>
 
-    </div>
+            <input
+            type="text"
+            class="form-control"
+            placeholder="Pedido relacionado">
+
+        </div>
+
+        <div class="mb-3">
+
+            <label class="form-label">
+                Fecha de Pago
+            </label>
+
+            <input
+            type="date"
+            class="form-control">
+
+        </div>
+
+        <div class="mb-3">
+
+            <label class="form-label">
+                Monto Total
+            </label>
+
+            <input
+            type="number"
+            class="form-control"
+            placeholder="Monto total del pedido">
+
+        </div>
+
+        <div class="mb-3">
+
+            <label class="form-label">
+                Abono
+            </label>
+
+            <input
+            type="number"
+            class="form-control"
+            placeholder="Cantidad abonada">
+
+        </div>
+
+        <div class="mb-3">
+
+            <label class="form-label">
+                Saldo Restante
+            </label>
+
+            <input
+            type="number"
+            class="form-control"
+            placeholder="Saldo pendiente">
+
+        </div>
+
+        <div class="mb-3">
+
+            <label class="form-label">
+                Método de Pago
+            </label>
+
+            <select class="form-control">
+
+                <option>Efectivo</option>
+                <option>Transferencia</option>
+                <option>Tarjeta</option>
+
+            </select>
+
+        </div>
+
+        <div class="mb-3">
+
+            <label class="form-label">
+                Estado
+            </label>
+
+            <select class="form-control">
+
+                <option>Pendiente</option>
+                <option>Parcial</option>
+                <option>Pagado</option>
+
+            </select>
+
+        </div>
+
+        <button class="btn btn-success">
+
+            <i class="bi bi-check-circle-fill"></i>
+            Guardar
+
+        </button>
+
+        <a href="/pagos"
+        class="btn btn-secondary">
+
+            <i class="bi bi-x-circle-fill"></i>
+            Cancelar
+
+        </a>
+
+    </form>
+
+</div>
+
 </div>
 
 @endsection

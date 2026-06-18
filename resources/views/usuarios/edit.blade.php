@@ -2,18 +2,34 @@
 
 @section('contenido')
 
-<h1>Editar Usuario</h1>
+<div class="mb-4">
+
+<h1 style="font-weight:bold;">
+
+    <i class="bi bi-pencil-square"
+    style="color:#d4af37;"></i>
+
+    Editar Usuario
+
+</h1>
+
+<p class="text-muted">
+
+    Modifica la información del usuario seleccionado.
+
+</p>
+
+</div>
 
 <div class="card shadow p-4">
 
-```
 <form>
 
     <div class="mb-3">
 
         <label class="form-label">
 
-            Nombre completo
+            Nombre Completo
 
         </label>
 
@@ -24,12 +40,11 @@
 
     </div>
 
-
     <div class="mb-3">
 
         <label class="form-label">
 
-            Correo electrónico
+            Correo Electrónico
 
         </label>
 
@@ -40,12 +55,11 @@
 
     </div>
 
-
     <div class="mb-3">
 
         <label class="form-label">
 
-            Nueva contraseña
+            Nueva Contraseña
 
         </label>
 
@@ -56,8 +70,7 @@
 
     </div>
 
-
-    <div class="mb-4">
+    <div class="mb-3">
 
         <label class="form-label">
 
@@ -67,37 +80,44 @@
 
         <select class="form-select">
 
-            <option selected>
+            <option selected>Administrador</option>
 
-                Administrador
+            <option>Supervisor</option>
 
-            </option>
-
-            <option>
-
-                Usuario
-
-            </option>
-
-            <option>
-
-                Temporal
-
-            </option>
+            <option>Empleado</option>
 
         </select>
 
     </div>
 
+    <div class="mb-4">
+
+        <label class="form-label">
+
+            Estado
+
+        </label>
+
+        <select class="form-select">
+
+            <option selected>Activo</option>
+
+            <option>Inactivo</option>
+
+        </select>
+
+    </div>
 
     <button class="btn btn-success">
 
+        <i class="bi bi-check-circle-fill"></i>
         Actualizar
 
     </button>
 
     <button class="btn btn-danger">
 
+        <i class="bi bi-trash-fill"></i>
         Eliminar Usuario
 
     </button>
@@ -105,12 +125,12 @@
     <a href="/usuarios"
     class="btn btn-secondary">
 
+        <i class="bi bi-x-circle-fill"></i>
         Cancelar
 
     </a>
 
 </form>
-```
 
 </div>
 

@@ -2,54 +2,118 @@
 
 @section('contenido')
 
-<h1>Editar Trabajador</h1>
+<div class="mb-4">
+
+<h1 style="font-weight:bold;">
+
+    <i class="bi bi-pencil-square"
+    style="color:#d4af37;"></i>
+
+    Editar Trabajador
+
+</h1>
+
+<p class="text-muted">
+
+    Modifica la información del trabajador seleccionado.
+
+</p>
+
+</div>
 
 <div class="card">
-    <div class="card-body">
 
-        <form>
+<div class="card-body">
 
-            <div class="mb-3">
-                <label>Nombre completo</label>
-                <input type="text" class="form-control" value="María López">
-            </div>
+    <form>
 
-            <div class="mb-3">
-                <label>Teléfono</label>
-                <input type="text" class="form-control" value="2411234567">
-            </div>
+        <div class="mb-3">
 
-            <div class="mb-3">
-                <label>Puesto</label>
-                <input type="text" class="form-control" value="Costurera">
-            </div>
+            <label class="form-label">
+                Nombre Completo
+            </label>
 
-            <div class="mb-3">
-                <label>Área asignada</label>
-                <input type="text" class="form-control" value="Confección">
-            </div>
+            <input
+            type="text"
+            class="form-control"
+            value="María López">
 
-            <div class="mb-3">
-                <label>Estatus</label>
+        </div>
 
-                <select class="form-control">
-                    <option selected>Activo</option>
-                    <option>Inactivo</option>
-                </select>
+        <div class="mb-3">
 
-            </div>
+            <label class="form-label">
+                Teléfono
+            </label>
 
-            <button class="btn btn-success">
-                Actualizar
-            </button>
+            <input
+            type="text"
+            class="form-control"
+            value="2411234567">
 
-            <a href="/trabajadores" class="btn btn-secondary">
-                Cancelar
-            </a>
+        </div>
 
-        </form>
+        <div class="mb-3">
 
-    </div>
+            <label class="form-label">
+                Puesto
+            </label>
+
+            <input
+            type="text"
+            class="form-control"
+            value="Costurera">
+
+        </div>
+
+        <div class="mb-3">
+
+            <label class="form-label">
+                Área Asignada
+            </label>
+
+            <input
+            type="text"
+            class="form-control"
+            value="Confección">
+
+        </div>
+
+        <div class="mb-3">
+
+            <label class="form-label">
+                Estatus
+            </label>
+
+            <select class="form-control">
+
+                <option selected>Activo</option>
+                <option>Inactivo</option>
+                <option>Vacaciones</option>
+
+            </select>
+
+        </div>
+
+        <button class="btn btn-success">
+
+            <i class="bi bi-check-circle-fill"></i>
+            Actualizar
+
+        </button>
+
+        <a href="/trabajadores"
+        class="btn btn-secondary">
+
+            <i class="bi bi-x-circle-fill"></i>
+            Cancelar
+
+        </a>
+
+    </form>
+
+</div>
+
 </div>
 
 @endsection

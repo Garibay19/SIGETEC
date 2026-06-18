@@ -2,44 +2,116 @@
 
 @section('contenido')
 
-<h1>Nuevo Cliente</h1>
+<div class="mb-4">
+
+<h1 style="font-weight:bold;">
+
+    <i class="bi bi-person-plus-fill"
+    style="color:#d4af37;"></i>
+
+    Nuevo Cliente
+
+</h1>
+
+<p class="text-muted">
+
+    Registra un nuevo cliente en el sistema.
+
+</p>
+
+</div>
 
 <div class="card">
-    <div class="card-body">
 
-        <form>
+<div class="card-body">
 
-            <div class="mb-3">
-                <label>Nombre completo</label>
-                <input type="text" class="form-control" placeholder="Ingrese el nombre completo">
-            </div>
+    <form>
 
-            <div class="mb-3">
-                <label>Teléfono</label>
-                <input type="text" class="form-control" placeholder="Ingrese el teléfono">
-            </div>
+        <div class="mb-3">
 
-            <div class="mb-3">
-                <label>Dirección</label>
-                <input type="text" class="form-control" placeholder="Ingrese la dirección">
-            </div>
+            <label class="form-label">
+                Nombre Completo
+            </label>
 
-            <div class="mb-3">
-                <label>Correo</label>
-                <input type="email" class="form-control" placeholder="Ingrese el correo">
-            </div>
+            <input
+            type="text"
+            class="form-control"
+            placeholder="Ingrese el nombre completo">
 
-            <div class="mb-3">
-                <label>Observaciones</label>
-                <textarea class="form-control" rows="3"></textarea>
-            </div>
+        </div>
 
-            <button class="btn btn-success">Guardar</button>
-            <a href="/clientes" class="btn btn-secondary">Cancelar</a>
+        <div class="mb-3">
 
-        </form>
+            <label class="form-label">
+                Teléfono
+            </label>
 
-    </div>
+            <input
+            type="text"
+            class="form-control"
+            placeholder="Ingrese el teléfono">
+
+        </div>
+
+        <div class="mb-3">
+
+            <label class="form-label">
+                Dirección
+            </label>
+
+            <input
+            type="text"
+            class="form-control"
+            placeholder="Ingrese la dirección">
+
+        </div>
+
+        <div class="mb-3">
+
+            <label class="form-label">
+                Correo Electrónico
+            </label>
+
+            <input
+            type="email"
+            class="form-control"
+            placeholder="correo@ejemplo.com">
+
+        </div>
+
+        <div class="mb-3">
+
+            <label class="form-label">
+                Observaciones
+            </label>
+
+            <textarea
+            class="form-control"
+            rows="3"
+            placeholder="Información adicional del cliente">
+            </textarea>
+
+        </div>
+
+        <button class="btn btn-success">
+
+            <i class="bi bi-check-circle-fill"></i>
+            Guardar
+
+        </button>
+
+        <a href="/clientes"
+        class="btn btn-secondary">
+
+            <i class="bi bi-x-circle-fill"></i>
+            Cancelar
+
+        </a>
+
+    </form>
+
+</div>
+
 </div>
 
 @endsection

@@ -2,20 +2,38 @@
 
 @section('contenido')
 
-<h1>Usuarios del Sistema</h1>
+<div class="mb-4">
 
-<a href="/usuarios/create"
-class="btn btn-primary mb-3">
+    <h1 style="font-weight:bold;">
 
-```
-Nuevo Usuario
-```
+        <i class="bi bi-person-badge-fill"></i>
 
-</a>
+        Gestión de Usuarios
+
+    </h1>
+
+    <p class="text-muted">
+
+        Administra los usuarios autorizados para acceder al sistema.
+
+    </p>
+
+</div>
+
+
+<div class="text-end mb-3">
+
+    <a href="/usuarios/create"
+    class="btn btn-warning">
+<i class="bi bi-person-badge-fill"></i>
+        Nuevo Usuario
+
+    </a>
+
+</div>
 
 <table class="table table-striped">
 
-```
 <thead>
 
     <tr>
@@ -27,6 +45,8 @@ Nuevo Usuario
         <th>Correo</th>
 
         <th>Rol</th>
+
+        <th>Estado</th>
 
         <th>Acciones</th>
 
@@ -55,16 +75,17 @@ Nuevo Usuario
 
         </td>
 
-        <td>
+            <td>
+                <a href="/usuarios/edit" class="btn btn-warning btn-sm">
+                    <i class="bi bi-pencil-fill"></i>
+                    Editar
+                </a>
 
-            <a href="/usuarios/edit"
-            class="btn btn-warning btn-sm">
-
-                Editar
-
-            </a>
-
-        </td>
+                <button class="btn btn-danger btn-sm" onclick="return confirm('¿Está seguro de eliminar este registro?')">
+                    <i class="bi bi-trash-fill"></i>
+                    Eliminar
+                </button>
+            </td>  
 
     </tr>
 
@@ -87,21 +108,21 @@ Nuevo Usuario
 
         </td>
 
-        <td>
+         <td>
+                <a href="/clientes/edit" class="btn btn-warning btn-sm">
+                    <i class="bi bi-pencil-fill"></i>
+                    Editar
+                </a>
 
-            <a href="/usuarios/edit"
-            class="btn btn-warning btn-sm">
-
-                Editar
-
-            </a>
-
-        </td>
+                <button class="btn btn-danger btn-sm" onclick="return confirm('¿Está seguro de eliminar este registro?')">
+                    <i class="bi bi-trash-fill"></i>
+                    Eliminar
+                </button>
+            </td>  
 
     </tr>
 
 </tbody>
-```
 
 </table>
 

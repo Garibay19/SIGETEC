@@ -2,18 +2,34 @@
 
 @section('contenido')
 
-<h1>Nuevo Usuario</h1>
+<div class="mb-4">
+
+<h1 style="font-weight:bold;">
+
+    <i class="bi bi-person-plus-fill"
+    style="color:#d4af37;"></i>
+
+    Nuevo Usuario
+
+</h1>
+
+<p class="text-muted">
+
+    Registra un nuevo usuario en el sistema.
+
+</p>
+
+</div>
 
 <div class="card shadow p-4">
 
-```
 <form>
 
     <div class="mb-3">
 
         <label class="form-label">
 
-            Nombre completo
+            Nombre Completo
 
         </label>
 
@@ -24,12 +40,11 @@
 
     </div>
 
-
     <div class="mb-3">
 
         <label class="form-label">
 
-            Correo electrónico
+            Correo Electrónico
 
         </label>
 
@@ -39,7 +54,6 @@
         placeholder="correo@ejemplo.com">
 
     </div>
-
 
     <div class="mb-3">
 
@@ -56,8 +70,7 @@
 
     </div>
 
-
-    <div class="mb-4">
+    <div class="mb-3">
 
         <label class="form-label">
 
@@ -67,31 +80,37 @@
 
         <select class="form-select">
 
-            <option>
+            <option>Administrador</option>
 
-                Administrador
+            <option>Supervisor</option>
 
-            </option>
-
-            <option>
-
-                Usuario
-
-            </option>
-
-            <option>
-
-                Temporal
-
-            </option>
+            <option>Empleado</option>
 
         </select>
 
     </div>
 
+    <div class="mb-4">
+
+        <label class="form-label">
+
+            Estado
+
+        </label>
+
+        <select class="form-select">
+
+            <option>Activo</option>
+
+            <option>Inactivo</option>
+
+        </select>
+
+    </div>
 
     <button class="btn btn-success">
 
+        <i class="bi bi-check-circle-fill"></i>
         Guardar
 
     </button>
@@ -99,12 +118,12 @@
     <a href="/usuarios"
     class="btn btn-secondary">
 
+        <i class="bi bi-x-circle-fill"></i>
         Cancelar
 
     </a>
 
 </form>
-```
 
 </div>
 

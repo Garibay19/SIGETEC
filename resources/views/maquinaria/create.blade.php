@@ -2,55 +2,117 @@
 
 @section('contenido')
 
-<h1>Nueva Máquina</h1>
+<div class="mb-4">
+
+<h1 style="font-weight:bold;">
+
+    <i class="bi bi-gear-fill"
+    style="color:#d4af37;"></i>
+
+    Nueva Máquina
+
+</h1>
+
+<p class="text-muted">
+
+    Registra una nueva máquina o equipo en el sistema.
+
+</p>
+
+</div>
 
 <div class="card">
-    <div class="card-body">
 
-        <form>
+<div class="card-body">
 
-            <div class="mb-3">
-                <label>Nombre</label>
-                <input type="text" class="form-control" placeholder="Ejemplo: Máquina Recta">
-            </div>
+    <form>
 
-            <div class="mb-3">
-                <label>Marca</label>
-                <input type="text" class="form-control" placeholder="Ejemplo: Juki">
-            </div>
+        <div class="mb-3">
 
-            <div class="mb-3">
-                <label>Modelo</label>
-                <input type="text" class="form-control" placeholder="Ejemplo: DDL-8700">
-            </div>
+            <label class="form-label">
+                Nombre
+            </label>
 
-            <div class="mb-3">
-                <label>Estado</label>
+            <input
+            type="text"
+            class="form-control"
+            placeholder="Ejemplo: Máquina Recta">
 
-                <select class="form-control">
-                    <option>Operando</option>
-                    <option>En mantenimiento</option>
-                    <option>Fuera de servicio</option>
-                </select>
+        </div>
 
-            </div>
+        <div class="mb-3">
 
-            <div class="mb-3">
-                <label>Fecha de adquisición</label>
-                <input type="date" class="form-control">
-            </div>
+            <label class="form-label">
+                Marca
+            </label>
 
-            <button class="btn btn-success">
-                Guardar
-            </button>
+            <input
+            type="text"
+            class="form-control"
+            placeholder="Ejemplo: Juki">
 
-            <a href="/maquinaria" class="btn btn-secondary">
-                Cancelar
-            </a>
+        </div>
 
-        </form>
+        <div class="mb-3">
 
-    </div>
+            <label class="form-label">
+                Modelo
+            </label>
+
+            <input
+            type="text"
+            class="form-control"
+            placeholder="Ejemplo: DDL-8700">
+
+        </div>
+
+        <div class="mb-3">
+
+            <label class="form-label">
+                Estado
+            </label>
+
+            <select class="form-control">
+
+                <option>Operando</option>
+                <option>En mantenimiento</option>
+                <option>Fuera de servicio</option>
+
+            </select>
+
+        </div>
+
+        <div class="mb-3">
+
+            <label class="form-label">
+                Fecha de Adquisición
+            </label>
+
+            <input
+            type="date"
+            class="form-control">
+
+        </div>
+
+        <button class="btn btn-success">
+
+            <i class="bi bi-check-circle-fill"></i>
+            Guardar
+
+        </button>
+
+        <a href="/maquinaria"
+        class="btn btn-secondary">
+
+            <i class="bi bi-x-circle-fill"></i>
+            Cancelar
+
+        </a>
+
+    </form>
+
+</div>
+
 </div>
 
 @endsection
