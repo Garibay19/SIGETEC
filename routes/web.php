@@ -163,7 +163,64 @@ Route::delete('/maquinaria/{id}', [MaquinariaController::class, 'destroy'])->nam
 
 
 // MÓDULOS EN DESARROLLO (VISTAS ESTÁTICAS DE TU COMPAÑERO - CORREGIDO SIN DUPLICADOS)
-Route::get('/reportes', function () { return view('reportes.index'); });
+// 10. MÓDULO DE REPORTES (FINANZAS Y CONTROL EN TIEMPO REAL)
+Route::get('/reportes', function () {
+    // ---- 1. SECCIÓN DE VENTAS (Monto total pactado en contratos/pedidos) ----
+    $ventasHoy = App\Models\Pedido::whereDate('fecha_pedido', date('Y-m-d'))->sum('total');
+    
+    $ventasSemana = App\Models\Pedido::whereBetween('fecha_pedido', [
+        \Carbon\Carbon::now()->startOfWeek(), 
+        \Carbon\Carbon::now()->endOfWeek()
+    ])->sum('total');
+    
+    $ventasMes = App\Models\Pedido::whereMonth('fecha_pedido', date('m'))
+                                  ->whereYear('fecha_pedido', date('Y'))
+                                  ->sum('total');
+                                  
+    $ventasAno = App\Models\Pedido::whereYear('fecha_pedido', date('Y'))->sum('total');
+
+    // ---- 2. SECCIÓN DE GANANCIAS (Dinero real cobrado en caja mediante abonos) ----
+    $gananciaSemana = App\Models\Pago::whereBetween('fecha_pago', [
+        \Carbon\Carbon::now()->startOfWeek(), 
+        \Carbon\Carbon::now()->endOfWeek()
+    ])->sum('abono');
+
+    $gananciaMes = App\Models\Pago::whereMonth('fecha_pago', date('m'))
+                                  ->whereYear('fecha_pago', date('Y'))
+                                  ->sum('abono');
+
+    $gananciaAno = App\Models\Pago::whereYear('fecha_pago', date('Y'))->sum('abono');
+
+    // ---- 3. CÁLCULO DE GASTOS AUTOMÁTICOS (Inversión acumulada en bonos comerciales a trabajadores) ----
+    $gastosSemana = App\Models\Bono::whereBetween('created_at', [
+        \Carbon\Carbon::now()->startOfWeek(), 
+        \Carbon\Carbon::now()->endOfWeek()
+    ])->sum('monto_bono');
+
+    $gastosMes = App\Models\Bono::whereMonth('created_at', date('m'))
+                                ->whereYear('created_at', date('Y'))
+                                ->sum('monto_bono');
+
+    $gastosAno = App\Models\Bono::whereYear('created_at', date('Y'))->sum('monto_bono');
+
+    // ---- 4. GRAN TOTAL NETO FINANCIERO ----
+    $gananciaNetaTotal = $gananciaAno - $gastosAno;
+
+    // ---- 5. RESUMEN GENERAL DE INDICADORES OPERATIVOS ----
+    $pedidosCompletados = App\Models\Pedido::where('estado', 'Terminado')->count();
+    $pedidosPendientes = App\Models\Pedido::whereIn('estado', ['Pendiente', 'En proceso'])->count();
+    $pedidosCancelados = App\Models\Pedido::where('estado', 'Cancelado')->count(); // Si no manejan este estado, marcará 0 automáticamente
+    $trabajadoresActivos = App\Models\Trabajador::where('estatus', 'Activo')->count();
+    $bonosEntregados = App\Models\Bono::where('cumplimiento', 'Cumple')->count();
+    $usuariosRegistrados = App\Models\Cliente::count(); // Cuenta tus clientes como usuarios del flujo principal
+
+    return view('reportes.index', compact(
+        'gananciaNetaTotal', 'ventasHoy', 'ventasSemana', 'ventasMes', 'ventasAno',
+        'gastosSemana', 'gastosMes', 'gastosAno', 'gananciaSemana', 'gananciaMes', 'gananciaAno',
+        'pedidosCompletados', 'pedidosPendientes', 'pedidosCancelados', 'trabajadoresActivos', 'bonosEntregados', 'usuariosRegistrados'
+    ));
+});
+
 Route::get('/reportes/create', function () { return view('reportes.create'); });
 Route::get('/reportes/edit', function () { return view('reportes.edit'); });
 Route::get('/usuarios', function () { return view('usuarios.index'); });
