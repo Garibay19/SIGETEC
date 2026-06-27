@@ -6,10 +6,14 @@ use App\Http\Controllers\PedidoController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\PagoController;
 use App\Http\Controllers\BonoController;
+use App\Http\Controllers\MaterialController;
+use App\Http\Controllers\MaquinariaController;
 use App\Models\Cliente;
 use App\Models\Pedido;
 use App\Models\Pago;
 use App\Models\Bono;
+use App\Models\Material;
+use App\Models\Maquinaria;
 
 // 1. Pantalla de inicio (Login)
 Route::get('/', function () {
@@ -32,8 +36,7 @@ Route::get('/dashboard', function () {
 
 // 3. MÓDULO DE CLIENTES
 Route::get('/clientes', function () {
-    // Jalamos todos los clientes de la base de datos de forma limpia
-    $clientes = App\Models\Cliente::orderBy('id_cliente', 'desc')->get();
+    $clientes = Cliente::orderBy('id_cliente', 'desc')->get();
     return view('clientes.index', compact('clientes'));
 });
 
@@ -42,7 +45,6 @@ Route::get('/clientes/create', function () {
 });
 
 Route::post('/clientes/guardar', [ClienteController::class, 'store'])->name('clientes.store');
-
 Route::get('/clientes/{id}/edit', [ClienteController::class, 'edit'])->name('clientes.edit');
 Route::put('/clientes/{id}', [ClienteController::class, 'update'])->name('clientes.update');
 Route::delete('/clientes/{id}', [ClienteController::class, 'destroy'])->name('clientes.destroy');
@@ -104,9 +106,7 @@ Route::get('/trabajadores', function () {
     return view('trabajadores.index', compact('trabajadores'));
 });
 
-// CORREGIDO: Ruta para eliminar trabajadores añadida
 Route::delete('/trabajadores/{id}', [App\Http\Controllers\TrabajadorController::class, 'destroy'])->name('trabajadores.destroy');
-
 Route::get('/trabajadores/create', function () {
     return view('trabajadores.create');
 });
@@ -127,24 +127,42 @@ Route::get('/bonos/create', function () {
 });
 
 Route::post('/bonos/guardar', [BonoController::class, 'store'])->name('bonos.store');
-
-// Ruta dinámica para cargar la pantalla de editar con el ID del bono semanal
 Route::get('/bonos/{id}/edit', [BonoController::class, 'edit'])->name('bonos.edit');
-
-// CORREGIDO: Ruta para actualizar la producción por días en la base de datos
 Route::put('/bonos/{id}', [BonoController::class, 'update'])->name('bonos.update');
-
-// CORREGIDO: Ruta para eliminar el registro semanal cuando cierres caja
 Route::delete('/bonos/{id}', [BonoController::class, 'destroy'])->name('bonos.destroy');
 
+// 8. MÓDULO DE MATERIALES (INVENTARIO DINÁMICO)
+Route::get('/materiales', function () {
+    $materiales = Material::orderBy('id_material', 'desc')->get();
+    return view('materiales.index', compact('materiales'));
+});
 
-// MÓDULOS EN DESARROLLO (VISTAS ESTÁTICAS DE TU COMPAÑERO)
-Route::get('/materiales', function () { return view('materiales.index'); });
-Route::get('/materiales/create', function () { return view('materiales.create'); });
-Route::get('/materiales/edit', function () { return view('materiales.edit'); });
-Route::get('/maquinaria', function () { return view('maquinaria.index'); });
-Route::get('/maquinaria/create', function () { return view('maquinaria.create'); });
-Route::get('/maquinaria/edit', function () { return view('maquinaria.edit'); });
+Route::get('/materiales/create', function () {
+    return view('materiales.create');
+});
+
+Route::post('/materiales/guardar', [MaterialController::class, 'store'])->name('materiales.store');
+Route::get('/materiales/{id}/edit', [MaterialController::class, 'edit'])->name('materiales.edit');
+Route::put('/materiales/{id}', [MaterialController::class, 'update'])->name('materiales.update');
+Route::delete('/materiales/{id}', [MaterialController::class, 'destroy'])->name('materiales.destroy');
+
+// 9. MÓDULO DE MAQUINARIA (GESTIÓN DE ACTIVOS DEL TALLER)
+Route::get('/maquinaria', function () {
+    $maquinarias = Maquinaria::orderBy('id_maquinaria', 'desc')->get();
+    return view('maquinaria.index', compact('maquinarias'));
+});
+
+Route::get('/maquinaria/create', function () {
+    return view('maquinaria.create');
+});
+
+Route::post('/maquinaria/guardar', [MaquinariaController::class, 'store'])->name('maquinaria.store');
+Route::get('/maquinaria/{id}/edit', [MaquinariaController::class, 'edit'])->name('maquinaria.edit');
+Route::put('/maquinaria/{id}', [MaquinariaController::class, 'update'])->name('maquinaria.update');
+Route::delete('/maquinaria/{id}', [MaquinariaController::class, 'destroy'])->name('maquinaria.destroy');
+
+
+// MÓDULOS EN DESARROLLO (VISTAS ESTÁTICAS DE TU COMPAÑERO - CORREGIDO SIN DUPLICADOS)
 Route::get('/reportes', function () { return view('reportes.index'); });
 Route::get('/reportes/create', function () { return view('reportes.create'); });
 Route::get('/reportes/edit', function () { return view('reportes.edit'); });
