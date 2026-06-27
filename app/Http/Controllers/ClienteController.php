@@ -7,17 +7,19 @@ use Illuminate\Http\Request;
 
 class ClienteController extends Controller
 {
-    // 1. Guarda el cliente nuevo
+    // 1. Guarda el cliente nuevo de forma correcta
     public function store(Request $request)
     {
+        // CORREGIDO: Ahora se valida 'nombre_completo' en lugar de 'nombre'
         $request->validate([
-            'nombre' => 'required|string|max:100',
+            'nombre_completo' => 'required|string|max:100',
             'telefono' => 'nullable|string|max:20',
-            'email' => 'nullable|email|max:100',
+            'correo' => 'nullable|email|max:100',
             'direccion' => 'nullable|string|max:200',
             'observaciones' => 'nullable|string',
         ]);
 
+        // Guarda todos los campos del formulario en MySQL
         Cliente::create($request->all());
 
         return redirect('/clientes')->with('exito', '¡Cliente registrado con éxito!');
@@ -36,10 +38,11 @@ class ClienteController extends Controller
     // 3. Guarda los cambios modificados en el formulario de edición
     public function update(Request $request, $id)
     {
+        // CORREGIDO: Validación adaptada a 'nombre_completo'
         $request->validate([
-            'nombre' => 'required|string|max:100',
+            'nombre_completo' => 'required|string|max:100',
             'telefono' => 'nullable|string|max:20',
-            'email' => 'nullable|email|max:100',
+            'correo' => 'nullable|email|max:100',
             'direccion' => 'nullable|string|max:200',
             'observaciones' => 'nullable|string',
         ]);

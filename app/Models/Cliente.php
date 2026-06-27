@@ -14,9 +14,9 @@ class Cliente extends Model
 
     // AUTORIZACIÓN: Permitimos que el buscador inteligente cree clientes usando el nombre libre
     protected $fillable = [
-       'nombre',
+       'nombre_completo',
         'telefono',
-        'email',
+        'correo',
         'direccion',
         'observaciones' // Campo nuevo autorizado
     ];

@@ -10,7 +10,7 @@ class PedidoController extends Controller
 {
     public function store(Request $request)
     {
-        // 1. Validamos los datos (Cambiamos id_cliente por nombre_cliente)
+        // 1. Validamos los datos recibidos del formulario de pedidos
         $request->validate([
             'nombre_cliente' => 'required|string|max:100',
             'fecha_pedido' => 'required|date',
@@ -20,10 +20,16 @@ class PedidoController extends Controller
             'estado' => 'required|string|max:50',
         ]);
 
-        // 2. BUSCADOR INTELIGENTE: Busca si el cliente ya existe por su nombre.
-        // Si no existe, lo registra automáticamente en la tabla de clientes.
+        // 2. BUSCADOR INTELIGENTE PROTEGIDO: Busca si ya existe el cliente por su nombre completo.
+        // Si no existe, lo da de alta inyectando valores por defecto en los campos obligatorios del Frontend.
         $cliente = Cliente::firstOrCreate(
-            ['nombre' => $request->nombre_cliente]
+            ['nombre_completo' => $request->nombre_cliente],
+            [
+                'telefono' => 'N/A',
+                'correo' => 'sin_correo@ejemplo.com',
+                'direccion' => 'Dirección pendiente',
+                'observaciones' => 'Registrado automáticamente desde el módulo de pedidos.'
+            ]
         );
 
         // 3. Registramos el pedido vinculando el ID del cliente encontrado o recién creado
@@ -49,7 +55,8 @@ class PedidoController extends Controller
         }
         return redirect('/pedidos')->with('error', 'El pedido no se pudo encontrar.');
     }
-        // Función para mostrar la pantalla de edición con los datos del pedido actual
+
+    // Función para mostrar la pantalla de edición con los datos del pedido actual
     public function edit($id)
     {
         $pedido = Pedido::with('cliente')->find($id);
@@ -85,5 +92,4 @@ class PedidoController extends Controller
 
         return redirect('/pedidos')->with('error', 'No se pudo actualizar el pedido.');
     }
-
 }

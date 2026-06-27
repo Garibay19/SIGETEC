@@ -80,7 +80,8 @@
 
                         <div class="mb-3">
                             <label class="form-label text-muted">Cliente</label>
-                            <input type="text" class="form-control bg-light" value="{{ $pedido->cliente->nombre ?? 'Desconocido' }}" disabled>
+                            <!-- CORREGIDO: Cambiado de nombre a nombre_completo para leer la base de datos relacional sin romperse -->
+                            <input type="text" class="form-control bg-light" value="{{ $pedido->cliente->nombre_completo ?? 'Desconocido' }}" disabled>
                         </div>
 
                         <div class="mb-3">

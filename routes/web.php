@@ -32,7 +32,8 @@ Route::get('/dashboard', function () {
 
 // 3. MÓDULO DE CLIENTES
 Route::get('/clientes', function () {
-    $clientes = Cliente::all();
+    // Jalamos todos los clientes de la base de datos de forma limpia
+    $clientes = App\Models\Cliente::orderBy('id_cliente', 'desc')->get();
     return view('clientes.index', compact('clientes'));
 });
 

@@ -41,7 +41,8 @@
                         <tr>
                             <td><strong>#{{ $pago->id_pago }}</strong></td>
                             <!-- CORREGIDO: Ahora muestra el nombre del cliente real conectado al pedido -->
-                            <td>{{ $pago->pedido->cliente->nombre ?? 'Pedido #' . $pago->id_pedido }}</td>
+                            <td>{{ $pago->pedido->cliente->nombre_completo ?? 'Pedido #' . $pago->id_pedido }}</td>
+
                             <td>{{ \Carbon\Carbon::parse($pago->fecha_pago)->format('d/m/Y') }}</td>
                             <td>${{ number_format($pago->monto_total_pedido, 2) }}</td>
                             <td class="text-success font-weight-bold">+${{ number_format($pago->abono, 2) }}</td>

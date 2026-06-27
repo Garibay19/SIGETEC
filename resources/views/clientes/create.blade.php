@@ -15,41 +15,37 @@
 <div class="card">
     <div class="card-body">
 
-        <!-- CORREGIDO: Ruta agregada, método POST, token de seguridad y autocompletado desactivado -->
+        <!-- Formulario enlazado al controlador con método POST y autocompletado apagado -->
         <form action="{{ route('clientes.store') }}" method="POST" autocomplete="off">
             @csrf
 
             <div class="mb-3">
                 <label class="form-label">Nombre Completo</label>
-                <!-- CORREGIDO: Agregado name="nombre" y required -->
-                <input type="text" name="nombre" class="form-control" placeholder="Ingrese el nombre completo" required>
+                <!-- CORREGIDO: Se cambió name="nombre" por name="nombre_completo" para que coincida con el controlador -->
+                <input type="text" name="nombre_completo" class="form-control" placeholder="Ingrese el nombre completo" required>
             </div>
 
             <div class="mb-3">
                 <label class="form-label">Teléfono</label>
-                <!-- CORREGIDO: Agregado name="telefono" -->
                 <input type="text" name="telefono" class="form-control" placeholder="Ingrese el teléfono">
             </div>
 
             <div class="mb-3">
                 <label class="form-label">Dirección</label>
-                <!-- CORREGIDO: Agregado name="direccion" -->
                 <input type="text" name="direccion" class="form-control" placeholder="Ingrese la dirección">
             </div>
 
             <div class="mb-3">
                 <label class="form-label">Correo Electrónico</label>
-                <!-- CORREGIDO: Agregado name="email" -->
-                <input type="email" name="email" class="form-control" placeholder="correo@ejemplo.com">
+                ="correo" -->
+<input type="email" name="correo" class="form-control" placeholder="correo@ejemplo.com">
             </div>
 
             <div class="mb-3">
                 <label class="form-label">Observaciones</label>
-                <!-- Nota: Este campo se queda libre ya que tu backend actual no procesa observaciones por ahora -->
-                <textarea class="form-control" rows="3" placeholder="Información adicional del cliente"></textarea>
+                <textarea name="observaciones" class="form-control" rows="3" placeholder="Información adicional del cliente"></textarea>
             </div>
 
-            <!-- CORREGIDO: Agregado type="submit" para procesar el envío -->
             <button type="submit" class="btn btn-success">
                 <i class="bi bi-check-circle-fill"></i>
                 Guardar

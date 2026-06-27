@@ -37,7 +37,8 @@
                         <tr>
                             <td><strong>#{{ $pedido->id_pedido }}</strong></td>
                             <!-- Accedemos al nombre del cliente asignado relacionalmente -->
-                            <td>{{ $pedido->cliente->nombre ?? 'Cliente no encontrado' }}</td>
+                            <td>{{ $pedido->cliente->nombre_completo ?? 'Cliente no encontrado' }}</td>
+
                             <td>{{ $pedido->descripcion }}</td>
                             <td>{{ \Carbon\Carbon::parse($pedido->fecha_entrega)->format('d/m/Y') }}</td>
                             <td>${{ number_format($pedido->total, 2) }}</td>
