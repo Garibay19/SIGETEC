@@ -3,128 +3,67 @@
 @section('contenido')
 
 <div class="mb-4">
-
-<h1 style="font-weight:bold;">
-
-    <i class="bi bi-person-plus-fill"
-    style="color:#d4af37;"></i>
-
-    Nuevo Usuario
-
-</h1>
-
-<p class="text-muted">
-
-    Registra un nuevo usuario en el sistema.
-
-</p>
-
+    <h1 style="font-weight:bold;">
+        <i class="bi bi-person-plus-fill" style="color:#d4af37;"></i>
+        Nuevo Usuario
+    </h1>
+    <p class="text-muted">
+        Registra un nuevo usuario en el sistema.
+    </p>
 </div>
 
-<div class="card shadow p-4">
+<div class="card shadow-sm border-0" style="border-radius: 15px;">
+    <div class="card-body p-4">
 
-<form>
+        <!-- Formulario enlazado al controlador de usuarios con seguridad activa -->
+        <form action="{{ route('usuarios.store') }}" method="POST" autocomplete="off">
+            @csrf
 
-    <div class="mb-3">
+            <div class="mb-3">
+                <label class="form-label" style="font-weight: 500;">Nombre Completo</label>
+                <input type="text" name="name" class="form-control" placeholder="Nombre del usuario" required>
+            </div>
 
-        <label class="form-label">
+            <div class="mb-3">
+                <label class="form-label" style="font-weight: 500;">Correo Electrónico</label>
+                <input type="email" name="email" class="form-control" placeholder="correo@ejemplo.com" required>
+            </div>
 
-            Nombre Completo
+            <div class="mb-3">
+                <label class="form-label" style="font-weight: 500;">Contraseña</label>
+                <input type="password" name="password" class="form-control" placeholder="********" required minlength="8">
+                <small class="text-muted">La contraseña debe tener mínimo 8 caracteres.</small>
+            </div>
 
-        </label>
+            <div class="mb-3">
+                <label class="form-label" style="font-weight: 500;">Rol</label>
+                <select name="role" class="form-control" required>
+                    <option value="Invitado">Invitado (Solo Lectura / Uso Básico)</option>
+                    <option value="Administrador">Administrador (Gestiona cuentas y aplicaciones)</option>
+                    <option value="Superadministrador">Superadministrador (Control total del sistema)</option>
+                </select>
+            </div>
 
-        <input
-        type="text"
-        class="form-control"
-        placeholder="Nombre del usuario">
+            <div class="mb-3">
+                <label class="form-label" style="font-weight: 500;">Estado</label>
+                <select name="status" class="form-control" required>
+                    <option value="Activo">Activo</option>
+                    <option value="Inactivo">Inactivo</option>
+                </select>
+            </div>
 
-    </div>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-check-circle-fill"></i> Guardar
+                </button>
+                <a href="/usuarios" class="btn btn-secondary">
+                    <i class="bi bi-x-circle-fill"></i> Cancelar
+                </a>
+            </div>
 
-    <div class="mb-3">
-
-        <label class="form-label">
-
-            Correo Electrónico
-
-        </label>
-
-        <input
-        type="email"
-        class="form-control"
-        placeholder="correo@ejemplo.com">
-
-    </div>
-
-    <div class="mb-3">
-
-        <label class="form-label">
-
-            Contraseña
-
-        </label>
-
-        <input
-        type="password"
-        class="form-control"
-        placeholder="********">
-
-    </div>
-
-    <div class="mb-3">
-
-        <label class="form-label">
-
-            Rol
-
-        </label>
-
-        <select class="form-select">
-
-            <option>Administrador</option>
-
-            <option>Supervisor</option>
-
-            <option>Empleado</option>
-
-        </select>
+        </form>
 
     </div>
-
-    <div class="mb-4">
-
-        <label class="form-label">
-
-            Estado
-
-        </label>
-
-        <select class="form-select">
-
-            <option>Activo</option>
-
-            <option>Inactivo</option>
-
-        </select>
-
-    </div>
-
-    <button class="btn btn-success">
-
-        <i class="bi bi-check-circle-fill"></i>
-        Guardar
-
-    </button>
-
-    <a href="/usuarios"
-    class="btn btn-secondary">
-
-        <i class="bi bi-x-circle-fill"></i>
-        Cancelar
-
-    </a>
-
-</form>
-
 </div>
 
 @endsection

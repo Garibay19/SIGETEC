@@ -1,5 +1,7 @@
+{{--estamos usando el diseño principal que hice en app.blade.php--}}
 @extends('layouts.app')
 
+{{--Lo que este aqui se coloca donde esta @yield('contenido') en el layout--}}
 @section('contenido')
 
 <div class="mb-4">
@@ -14,9 +16,13 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <input type="text" class="form-control w-50" placeholder="Buscar maquinaria...">
-    <a href="/maquinaria/create" class="btn btn-warning">
-        <i class="bi bi-gear-fill"></i> Nueva Máquina 
-    </a>
+    
+    <!-- CORREGIDO: El rol de Invitado no puede ver el botón para crear nueva maquinaria -->
+    @if(auth()->user()?->role !== 'Invitado')
+        <a href="/maquinaria/create" class="btn btn-warning">
+            <i class="bi bi-gear-fill"></i> Nueva Máquina 
+        </a>
+    @endif
 </div>
 
 <div class="table-responsive">
@@ -33,7 +39,7 @@
             </tr>
         </thead>
         <tbody>
-            <!-- CORREGIDO: Ciclo dinámico conectado a la Base de Datos de MySQL -->
+            <!-- Ciclo dinámico conectado a la Base de Datos de MySQL -->
             @forelse($maquinarias as $maquina)
                 <tr>
                     <td>{{ $maquina->id_maquinaria }}</td>
@@ -53,19 +59,27 @@
                     <td>{{ $maquina->fecha_adquisicion ? \Carbon\Carbon::parse($maquina->fecha_adquisicion)->format('d/m/Y') : 'N/A' }}</td>
                     <td>
                         <div class="d-flex gap-2 justify-content-center">
-                            <!-- CORREGIDO: Botón Editar dinámico con el ID de la máquina -->
-                            <a href="{{ route('maquinaria.edit', $maquina->id_maquinaria) }}" class="btn btn-warning btn-sm">
-                                <i class="bi bi-pencil-fill"></i> Editar
-                            </a>
-    
-                            <!-- CORREGIDO: Formulario seguro con token para eliminar la máquina del sistema -->
-                            <form action="{{ route('maquinaria.destroy', $maquina->id_maquinaria) }}" method="POST" onsubmit="return confirm('¿Está seguro de eliminar esta máquina del registro? Esta acción no se puede deshacer.');" style="display:inline;">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-danger btn-sm">
-                                    <i class="bi bi-trash-fill"></i> Eliminar
-                                </button>
-                            </form>
+                            <!-- Verificación de rol para bloquear acciones al rol Invitado -->
+                            @if(auth()->user()?->role !== 'Invitado')
+                                <!-- CORREGIDO: Ajustado el parámetro a 'id' de acuerdo a tu routes/web.php -->
+                                <a href="{{ route('maquinaria.edit', ['id' => $maquina->id_maquinaria]) }}" class="btn btn-warning btn-sm">
+                                    <i class="bi bi-pencil-fill"></i> Editar
+                                </a>
+        
+                                <!-- CORREGIDO: Ajustado el parámetro a 'id' en el formulario seguro de eliminación -->
+                                <form action="{{ route('maquinaria.destroy', ['id' => $maquina->id_maquinaria]) }}" method="POST" onsubmit="return confirm('¿Está seguro de eliminar esta máquina del registro? Esta acción no se puede deshacer.');" style="display:inline;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger btn-sm">
+                                        <i class="bi bi-trash-fill"></i> Eliminar
+                                    </button>
+                                </form>
+                            @else
+                                <!-- CORREGIDO: Ajustada la insignia con el estilo unificado de 14px -->
+                                <span class="badge bg-light text-muted border px-2 py-1" style="font-size: 14px;">
+                                    <i class="bi bi-eye-fill"></i> Solo Lectura
+                                </span>
+                            @endif
                         </div>
                     </td>  
                 </tr>

@@ -14,17 +14,21 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <input type="text" class="form-control w-50" placeholder="Buscar Trabajadores...">
-    <a href="/trabajadores/create" class="btn btn-warning">
-        <i class="bi bi-person-workspace"></i>
-        Nuevo Trabajador
-    </a>
+    
+    <!-- CORREGIDO: Bloqueo visual del botón superior de registro para el rol Invitado -->
+    @if(auth()->user()?->role !== 'Invitado')
+        <a href="/trabajadores/create" class="btn btn-warning">
+            <i class="bi bi-person-workspace"></i>
+            Nuevo Trabajador
+        </a>
+    @endif
 </div>
 
-<table class="table table-striped align-middle">
+<table class="table table-striped align-middle text-center">
     <thead>
         <tr>
             <th>ID</th>
-            <th>Nombre completo</th>
+            <th class="text-start">Nombre completo</th>
             <th>Teléfono</th>
             <th>Puesto</th>
             <th>Área asignada</th>
@@ -38,7 +42,7 @@
         @forelse($trabajadores as $trabajador)
             <tr>
                 <td>{{ $trabajador->id_trabajador }}</td>
-                <td>{{ $trabajador->nombre }}</td>
+                <td class="text-start">{{ $trabajador->nombre }}</td>
                 <td>{{ $trabajador->telefono ?? 'N/A' }}</td>
                 <td>{{ $trabajador->puesto ?? 'N/A' }}</td>
                 <td>{{ $trabajador->area_asignada ?? 'N/A' }}</td>
@@ -54,20 +58,28 @@
                 </td>
                 
                 <td>
-                    <div class="d-flex gap-2">
-                        <!-- CORREGIDO: Botón Editar dinámico con el ID del trabajador -->
-                        <a href="{{ route('trabajadores.edit', $trabajador->id_trabajador) }}" class="btn btn-warning btn-sm">
-                            <i class="bi bi-pencil-fill"></i> Editar
-                        </a>
+                    <div class="d-flex gap-2 justify-content-center">
+                        <!-- CORREGIDO: Bloqueo total de botones de edición y borrado si la sesión es de Invitado -->
+                        @if(auth()->user()?->role !== 'Invitado')
+                            <!-- CORREGIDO: Botón Editar dinámico con el ID del trabajador -->
+                            <a href="{{ route('trabajadores.edit', $trabajador->id_trabajador) }}" class="btn btn-warning btn-sm">
+                                <i class="bi bi-pencil-fill"></i> Editar
+                            </a>
 
-                        <!-- CORREGIDO: Formulario seguro para eliminar al trabajador -->
-                        <form action="{{ route('trabajadores.destroy', $trabajador->id_trabajador) }}" method="POST" onsubmit="return confirm('¿Está seguro de eliminar este registro? Esta acción no se puede deshacer.');" style="display:inline;">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm">
-                                <i class="bi bi-trash-fill"></i> Eliminar
-                            </button>
-                        </form>
+                            <!-- CORREGIDO: Formulario seguro para eliminar al trabajador -->
+                            <form action="{{ route('trabajadores.destroy', $trabajador->id_trabajador) }}" method="POST" onsubmit="return confirm('¿Está seguro de eliminar este registro? Esta acción no se puede deshacer.');" style="display:inline;">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger btn-sm">
+                                    <i class="bi bi-trash-fill"></i> Eliminar
+                                </button>
+                            </form>
+                        @else
+                            <!-- Mensaje indicativo para el personal con cuenta de Invitado -->
+                            <span class="badge bg-light text-muted border px-2 py-1" style="font-size: 11px;">
+                                <i class="bi bi-eye-fill"></i> Solo Lectura
+                            </span>
+                        @endif
                     </div>
                 </td>  
             </tr>

@@ -1,5 +1,7 @@
+{{--estamos usando el diseño principal que hice en app.blade.php--}}
 @extends('layouts.app')
 
+{{--Lo que este aqui se coloca donde esta @yield('contenido') en el layout--}}
 @section('contenido')
 
 <div class="mb-4">
@@ -14,9 +16,13 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <input type="text" class="form-control w-50" placeholder="Buscar materiales...">
-    <a href="/materiales/create" class="btn btn-warning">
-        <i class="bi bi-box-seam-fill"></i> Nuevo Material
-    </a>
+    
+    <!-- CORREGIDO: El rol de Invitado no puede ver el botón para crear nuevos materiales -->
+    @if(auth()->user()?->role !== 'Invitado')
+        <a href="/materiales/create" class="btn btn-warning">
+            <i class="bi bi-box-seam-fill"></i> Nuevo Material
+        </a>
+    @endif
 </div>
 
 <div class="table-responsive">
@@ -37,7 +43,7 @@
             </tr>
         </thead>
         <tbody>
-            <!-- CORREGIDO: Ciclo dinámico conectado a la Base de Datos de MySQL -->
+            <!-- Ciclo dinámico conectado a la Base de Datos de MySQL -->
             @forelse($materiales as $material)
                 <tr>
                     <td>{{ $material->id_material }}</td>
@@ -48,31 +54,38 @@
                     <td class="fw-bold {{ $material->stock_danado > 0 ? 'text-danger' : 'text-muted' }}">
                         {{ number_format($material->stock_danado) }}
                     </td>
-                    <td>{{ $material->unidad_medida }}</td>
+                    <td>{{ $material->text_medida ?? $material->unidad_medida }}</td>
                     <td class="fw-bold">${{ number_format($material->costo_unitario, 2) }}</td>
                     <td>{{ $material->proveedor ?? 'N/A' }}</td>
                     <td>{{ $material->fecha_compra ? \Carbon\Carbon::parse($material->fecha_compra)->format('d/m/Y') : 'N/A' }}</td>
                     <td>
                         <div class="d-flex gap-2 justify-content-center">
-                            <!-- CORREGIDO: Botón Editar dinámico con el ID del material -->
-                            <a href="{{ route('materiales.edit', $material->id_material) }}" class="btn btn-warning btn-sm">
-                                <i class="bi bi-pencil-fill"></i> Editar
-                            </a>
-    
-                            <!-- CORREGIDO: Formulario seguro con token para remover el material del inventario -->
-                            <form action="{{ route('materiales.destroy', $material->id_material) }}" method="POST" onsubmit="return confirm('¿Está seguro de eliminar este material del inventario? Esta acción no se puede deshacer.');" style="display:inline;">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-danger btn-sm">
-                                    <i class="bi bi-trash-fill"></i> Eliminar
-                                </button>
-                            </form>
+                            <!-- Verificación de rol para bloquear acciones al rol Invitado -->
+                            @if(auth()->user()?->role !== 'Invitado')
+                                <!-- CORREGIDO: Ajustado el parámetro a 'id' de acuerdo a tu routes/web.php -->
+                                <a href="{{ route('materiales.edit', ['id' => $material->id_material]) }}" class="btn btn-warning btn-sm">
+                                    <i class="bi bi-pencil-fill"></i> Editar
+                                </a>
+        
+                                <!-- CORREGIDO: Ajustado el parámetro a 'id' en el formulario seguro de eliminación -->
+                                <form action="{{ route('materiales.destroy', ['id' => $material->id_material]) }}" method="POST" onsubmit="return confirm('¿Está seguro de eliminar este material del inventario? Esta acción no se puede deshacer.');" style="display:inline;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger btn-sm">
+                                        <i class="bi bi-trash-fill"></i> Eliminar
+                                    </button>
+                                </form>
+                            @else
+                                <!-- CORREGIDO: Ajustada la insignia con el estilo unificado de 14px -->
+                                <span class="badge bg-light text-muted border px-2 py-1" style="font-size: 14px;">
+                                    <i class="bi bi-eye-fill"></i> Solo Lectura
+                                </span>
+                            @endif
                         </div>
                     </td>  
                 </tr>
             @empty
                 <tr>
-                    <!-- CORREGIDO: Expandido el colspan a 10 para cubrir la nueva columna sin deformar la tabla -->
                     <td colspan="10" class="text-center text-muted py-4">
                         <i class="bi bi-info-circle fs-4"></i> No hay materiales registrados en el inventario actual.
                     </td>
