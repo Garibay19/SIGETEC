@@ -130,7 +130,8 @@
             <a href="/materiales"><i class="bi bi-box-seam"></i> &nbsp; Materiales</a>
             <a href="/maquinaria"><i class="bi bi-gear-fill"></i> &nbsp; Maquinaria</a>
             <a href="/reportes"><i class="bi bi-bar-chart-fill"></i> &nbsp; Reportes</a>
-            
+            <a href="/prendas"><i class="bi bi-scissors"></i> &nbsp; Muestrario Prendas</a>
+
             <!-- RESTRICCIÓN VISUAL: Solo Superadmin y Admin pueden gestionar el catálogo de usuarios -->
             @if(auth()->user()?->role !== 'Invitado')
                 <a href="/usuarios"><i class="bi bi-person-gear"></i> &nbsp; Usuarios</a>
@@ -169,6 +170,10 @@
         </div>
     </div>
 </div>
+    <!-- Script de Bootstrap para la interactividad de Modales y Cierres -->
+    <script src="https://jsdelivr.net"></script>
+</body>
+</html>
 
 </body>
 </html>

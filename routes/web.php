@@ -187,8 +187,7 @@ Route::middleware(['auth', 'no.invitado'])->group(function () {
         Route::get('/usuarios/{id}/edit', [UsuarioController::class, 'edit'])->name('usuarios.edit');
         Route::put('/usuarios/{id}', [UsuarioController::class, 'update'])->name('usuarios.update');
         Route::delete('/usuarios/{id}', [UsuarioController::class, 'destroy'])->name('usuarios.destroy');
-
-      // 10. MÓDULO DE REPORTES
+    // 10. MÓDULO DE REPORTES
     Route::get('/reportes', function () {
         $ventasHoy = Pedido::whereDate('fecha_pedido', date('Y-m-d'))->sum('total');
         $ventasSemana = Pedido::whereBetween('fecha_pedido', [\Carbon\Carbon::now()->startOfWeek(), \Carbon\Carbon::now()->endOfWeek()])->sum('total');
@@ -232,4 +231,19 @@ Route::middleware(['auth', 'no.invitado'])->group(function () {
         ));
     });
 
-}); // Este es el único cierre que debe quedar al final (cierra el middleware de la línea 49)
+    // 11. MÓDULO DE PRENDAS (Vista de consulta independiente para todos los logueados)
+    Route::get('/prendas', function () {
+        $prendas = \App\Models\Prenda::orderBy('id_prenda', 'desc')->get();
+        return view('prendas.index', compact('prendas'));
+    });
+
+    // ======================================================================
+    // SECCIÓN DE ESCRITURA DE PRENDAS (Bloqueado para el rol Invitado)
+    // ======================================================================
+    Route::middleware(['no.invitado'])->group(function () {
+        Route::get('/prendas/create', function () { return view('prendas.create'); });
+        Route::post('/prendas/guardar', [\App\Http\Controllers\PrendaController::class ?: 'App\Http\Controllers\PrendaController', 'store'])->name('prendas.store');
+        Route::delete('/prendas/{id}', [\App\Http\Controllers\PrendaController::class ?: 'App\Http\Controllers\PrendaController', 'destroy'])->name('prendas.destroy');
+    });
+
+}); // Cierre definitivo global del archivo (cierra el grupo 'auth' general)
