@@ -2,28 +2,27 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Pedido extends Model
 {
-    // Le indicamos el nombre exacto de la tabla en MySQL
-    protected $table = 'pedidos';
+    use HasFactory;
 
-    // Definimos la llave primaria de la tabla
+    protected $table = 'pedidos';
     protected $primaryKey = 'id_pedido';
 
-    // AUTORIZACIÓN: Permitimos que estos campos guarden datos masivos de los formularios
     protected $fillable = [
-       'id_cliente',
-        'fecha_pedido', // Campo nuevo agregado
+        'id_cliente',
         'descripcion',
+        'fecha_pedido',
         'fecha_entrega',
         'total',
         'saldo_pendiente',
         'estado'
     ];
 
-    // Relación relacional: Un pedido pertenece a un cliente específico
+    // Relación nativa para traer los datos del cliente de forma automática
     public function cliente()
     {
         return $this->belongsTo(Cliente::class, 'id_cliente', 'id_cliente');

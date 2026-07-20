@@ -85,10 +85,18 @@ Route::middleware(['auth', 'no.invitado'])->group(function () {
     Route::delete('/clientes/{id}', [ClienteController::class, 'destroy'])->name('clientes.destroy');
 
     // 4. MÓDULO DE PEDIDOS
+       // 4. MÓDULO DE PEDIDOS
     Route::get('/pedidos', function () {
         $pedidos = Pedido::with('cliente')->get();
         return view('pedidos.index', compact('pedidos'));
     });
+    
+    // NUEVA UBICACIÓN ULTRA-ESTABLE: Abre el formulario inyectando los clientes
+    Route::get('/pedidos/create', function () {
+        $clientes = \App\Models\Cliente::orderBy('nombre_completo', 'asc')->get();
+        return view('pedidos.create', compact('clientes'));
+    });
+
     Route::post('/pedidos/guardar', [PedidoController::class, 'store'])->name('pedidos.store');
     Route::delete('/pedidos/{id}', [PedidoController::class, 'destroy'])->name('pedidos.destroy');
     Route::get('/pedidos/create', function () {
@@ -98,9 +106,11 @@ Route::middleware(['auth', 'no.invitado'])->group(function () {
     Route::get('/pedidos/{id}/edit', [PedidoController::class, 'edit'])->name('pedidos.edit');
     Route::put('/pedidos/{id}', [PedidoController::class, 'update'])->name('pedidos.update');
 
-        // 5. MÓDULO DE PAGOS
+           // 5. MÓDULO DE PAGOS (Estructura Multi-Pedido y Multi-Abono Infinita)
     Route::get('/pagos', function () {
-        $pagosConsolidados = Pago::with('pedido.cliente')
+        // CORREGIDO: Forzamos a Laravel a cargar profundamente la relación del pedido y su cliente 
+        // antes de realizar la agrupación en MySQL, evitando que se pierdan los datos del cliente.
+        $pagosConsolidados = Pago::with(['pedido.cliente'])
             ->select('id_pedido', 
                 DB::raw('MAX(id_pago) as id_pago'), 
                 DB::raw('MAX(fecha_pago) as fecha_pago'), 
@@ -119,12 +129,21 @@ Route::middleware(['auth', 'no.invitado'])->group(function () {
             $pago->saldo_restante = $pago->ultimo_saldo;
             return $pago;
         });
+        
         return view('pagos.index', compact('pagos'));
     });
+
     Route::get('/pagos/create', function () {
-        $pedidos = Pedido::with('cliente')->where('saldo_pendiente', '>', 0)->get();
+        // CORREGIDO: Al listar los pedidos con saldo pendiente para abonar, 
+        // incluimos explícitamente el ID del pedido y el nombre del cliente. 
+        // Así, si un cliente tiene 3 pedidos activos, aparecerán 3 opciones diferentes en el menú.
+        $pedidos = Pedido::with('cliente')
+            ->where('saldo_pendiente', '>', 0)
+            ->orderBy('id_pedido', 'desc')
+            ->get();
         return view('pagos.create', compact('pedidos'));
     });
+
     Route::post('/pagos/guardar', [PagoController::class, 'store'])->name('pagos.store');
     Route::get('/pagos/{id}/edit', [PagoController::class, 'edit'])->name('pagos.edit');
     Route::put('/pagos/{id}', [PagoController::class, 'update'])->name('pagos.update');
@@ -187,8 +206,45 @@ Route::middleware(['auth', 'no.invitado'])->group(function () {
         Route::get('/usuarios/{id}/edit', [UsuarioController::class, 'edit'])->name('usuarios.edit');
         Route::put('/usuarios/{id}', [UsuarioController::class, 'update'])->name('usuarios.update');
         Route::delete('/usuarios/{id}', [UsuarioController::class, 'destroy'])->name('usuarios.destroy');
-    // 10. MÓDULO DE REPORTES
-    Route::get('/reportes', function () {
+       // 10. MÓDULO DE REPORTES (Propuesta Mejorada con Filtros Reales de Base de Datos)
+    Route::get('/reportes', function (Request $request) {
+        // Capturamos los parámetros que vienen desde los inputs del formulario
+        $tipoFiltro = $request->input('tipo_filtro', 'todos');
+        $fechaDia = $request->input('fecha_dia');
+        $fechaMes = $request->input('fecha_mes'); // Formato Y-m
+        $fechaAno = $request->input('fecha_ano', date('Y'));
+
+        // 1. Inicializamos los objetos de consulta (Query Builders) para filtrar
+        $queryVentas = Pedido::query();
+        $queryGanancias = Pago::query();
+        $queryGastos = Bono::query();
+
+        // 2. Aplicamos los filtros de fechas reales según la elección del usuario
+        if ($tipoFiltro === 'dia' && $fechaDia) {
+            $queryVentas->whereDate('fecha_pedido', $fechaDia);
+            $queryGanancias->whereDate('fecha_pago', $fechaDia);
+            $queryGastos->whereDate('created_at', $fechaDia);
+        } elseif ($tipoFiltro === 'mes' && $fechaMes) {
+            // El formato de html input type="month" es YYYY-MM
+            $partesMes = explode('-', $fechaMes);
+            if (count($partesMes) == 2) {
+                $queryVentas->whereYear('fecha_pedido', $partesMes[0])->whereMonth('fecha_pedido', $partesMes[1]);
+                $queryGanancias->whereYear('fecha_pago', $partesMes[0])->whereMonth('fecha_pago', $partesMes[1]);
+                $queryGastos->whereYear('created_at', $partesMes[0])->whereMonth('created_at', $partesMes[1]);
+            }
+        } elseif ($tipoFiltro === 'ano' && $fechaAno) {
+            $queryVentas->whereYear('fecha_pedido', $fechaAno);
+            $queryGanancias->whereYear('fecha_pago', $fechaAno);
+            $queryGastos->whereYear('created_at', $fechaAno);
+        }
+
+        // 3. Calculamos los bloques dinámicos filtrados en base a lo anterior
+        $ventasFiltradas = $queryVentas->sum('total');
+        $gananciasFiltradas = $queryGanancias->sum('abono');
+        $gastosFiltrados = $queryGastos->sum('monto_bono');
+        $gananciaNetaTotal = $gananciasFiltradas - $gastosFiltrados;
+
+        // 4. Mantenemos los cálculos estáticos fijos por si la vista aún los requiere de fondo
         $ventasHoy = Pedido::whereDate('fecha_pedido', date('Y-m-d'))->sum('total');
         $ventasSemana = Pedido::whereBetween('fecha_pedido', [\Carbon\Carbon::now()->startOfWeek(), \Carbon\Carbon::now()->endOfWeek()])->sum('total');
         $ventasMes = Pedido::whereMonth('fecha_pedido', date('m'))->whereYear('fecha_pedido', date('Y'))->sum('total');
@@ -197,37 +253,15 @@ Route::middleware(['auth', 'no.invitado'])->group(function () {
         $gananciaMes = Pago::whereMonth('fecha_pago', date('m'))->whereYear('fecha_pago', date('Y'))->sum('abono');
         $gananciaAno = Pago::whereYear('fecha_pago', date('Y'))->sum('abono');
         $gastosSemana = Bono::whereBetween('created_at', [\Carbon\Carbon::now()->startOfWeek(), \Carbon\Carbon::now()->endOfWeek()])->sum('monto_bono');
-        
         $gastosMes = Bono::whereMonth('created_at', date('m'))->whereYear('created_at', date('Y'))->sum('monto_bono');
         $gastosAno = Bono::whereYear('created_at', date('Y'))->sum('monto_bono');
-        $gananciaNetaTotal = $gananciaAno - $gastosAno;
 
-        $pedidosCompletados = Pedido::where('estado', 'Completado')->count();
-        $pedidosPendientes = Pedido::where('estado', 'Pendiente')->count();
-        $pedidosCancelados = Pedido::where('estado', 'Cancelado')->count();
-
-        $trabajadoresActivos = \App\Models\Trabajador::where('estatus', 'Activo')->count();
-        $bonosEntregados = Bono::count();
-        $usuariosRegistrados = User::count();
-        
         return view('reportes.index', compact(
-            'ventasHoy', 
-            'ventasSemana', 
-            'ventasMes', 
-            'ventasAno', 
-            'gananciaSemana', 
-            'gananciaMes', 
-            'gananciaAno', 
-            'gastosSemana', 
-            'gastosMes', 
-            'gastosAno', 
-            'gananciaNetaTotal',
-            'pedidosCompletados',
-            'pedidosPendientes',
-            'pedidosCancelados',
-            'trabajadoresActivos',
-            'bonosEntregados',
-            'usuariosRegistrados'
+            'ventasHoy', 'ventasSemana', 'ventasMes', 'ventasAno',
+            'gananciaSemana', 'gananciaMes', 'gananciaAno',
+            'gastosSemana', 'gastosMes', 'gastosAno',
+            'gananciaNetaTotal', 'ventasFiltradas', 'gananciasFiltradas', 'gastosFiltrados',
+            'tipoFiltro', 'fechaDia', 'fechaMes', 'fechaAno'
         ));
     });
 

@@ -1,24 +1,27 @@
+{{--estamos usando el diseño principal que hice en app.blade.php--}}
 @extends('layouts.app')
 
+{{--Lo que este aqui se coloca donde esta @yield('contenido') en el layout--}}
 @section('contenido')
 
 <div class="mb-4">
     <h1 style="font-weight:bold;">
-        <i class="bi bi-person-workspace"></i>
+        <i class="bi bi-person-fill"></i>
         Gestión de Trabajadores
     </h1>
     <p class="text-muted">
-        Administra la información del personal autorizado.
+        Administra la información y el estatus del personal del taller.
     </p>
 </div>
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <input type="text" class="form-control w-50" placeholder="Buscar Trabajadores...">
+    <!-- CORREGIDO: Se añadió el id="inputBuscarTrabajador" para capturar el texto en tiempo real -->
+    <input type="text" id="inputBuscarTrabajador" class="form-control w-50" placeholder="Buscar trabajador por nombre, puesto o teléfono...">
     
-    <!-- CORREGIDO: Bloqueo visual del botón superior de registro para el rol Invitado -->
+    <!-- El rol de Invitado no puede ver el botón para registrar nuevos trabajadores -->
     @if(auth()->user()?->role !== 'Invitado')
         <a href="/trabajadores/create" class="btn btn-warning">
-            <i class="bi bi-person-workspace"></i>
+            <i class="bi bi-person-plus-fill"></i>
             Nuevo Trabajador
         </a>
     @endif
@@ -28,46 +31,38 @@
     <thead>
         <tr>
             <th>ID</th>
-            <th class="text-start">Nombre completo</th>
+            <th class="text-start">Nombre Completo</th>
+            <th>Puesto / Función</th>
             <th>Teléfono</th>
-            <th>Puesto</th>
-            <th>Área asignada</th>
             <th>Estatus</th>
             <th>Acciones</th>
         </tr>
     </thead>
-
-    <tbody>
-        <!-- CORREGIDO: Ciclo dinámico para recorrer los trabajadores reales de MySQL -->
+    <!-- CORREGIDO: Se añadió el id="tablaTrabajadores" para que JavaScript escanee las filas -->
+    <tbody id="tablaTrabajadores">
+        <!-- Ciclo dinámico de Laravel para recorrer los trabajadores reales -->
         @forelse($trabajadores as $trabajador)
             <tr>
                 <td>{{ $trabajador->id_trabajador }}</td>
-                <td class="text-start">{{ $trabajador->nombre }}</td>
+                <td class="text-start"><strong>{{ $trabajador->nombre }}</strong></td>
+                <td><span class="badge bg-light text-dark border">{{ $trabajador->puesto ?? 'Operador' }}</span></td>
                 <td>{{ $trabajador->telefono ?? 'N/A' }}</td>
-                <td>{{ $trabajador->puesto ?? 'N/A' }}</td>
-                <td>{{ $trabajador->area_asignada ?? 'N/A' }}</td>
                 <td>
-                    <!-- CORREGIDO: Marcador visual dinámico según el estatus del empleado -->
-                    @if($trabajador->estatus == 'Activo')
+                    @if(($trabajador->estatus ?? $trabajador->status) == 'Activo')
                         <span class="badge bg-success">Activo</span>
-                    @elseif($trabajador->estatus == 'Inactivo')
-                        <span class="badge bg-danger">Inactivo</span>
                     @else
-                        <span class="badge bg-warning text-dark">Vacaciones</span>
+                        <span class="badge bg-danger">Inactivo</span>
                     @endif
                 </td>
-                
                 <td>
                     <div class="d-flex gap-2 justify-content-center">
-                        <!-- CORREGIDO: Bloqueo total de botones de edición y borrado si la sesión es de Invitado -->
+                        <!-- Verificación de rol para bloquear acciones al rol Invitado -->
                         @if(auth()->user()?->role !== 'Invitado')
-                            <!-- CORREGIDO: Botón Editar dinámico con el ID del trabajador -->
-                            <a href="{{ route('trabajadores.edit', $trabajador->id_trabajador) }}" class="btn btn-warning btn-sm">
+                            <a href="{{ route('trabajadores.edit', ['id' => $trabajador->id_trabajador]) }}" class="btn btn-warning btn-sm">
                                 <i class="bi bi-pencil-fill"></i> Editar
                             </a>
 
-                            <!-- CORREGIDO: Formulario seguro para eliminar al trabajador -->
-                            <form action="{{ route('trabajadores.destroy', $trabajador->id_trabajador) }}" method="POST" onsubmit="return confirm('¿Está seguro de eliminar este registro? Esta acción no se puede deshacer.');" style="display:inline;">
+                            <form action="{{ route('trabajadores.destroy', ['id' => $trabajador->id_trabajador]) }}" method="POST" onsubmit="return confirm('¿Está seguro de dar de baja a este trabajador? Esta acción conservará sus registros históricos de bonos.');" style="display:inline;">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-danger btn-sm">
@@ -75,22 +70,58 @@
                                 </button>
                             </form>
                         @else
-                            <!-- Mensaje indicativo para el personal con cuenta de Invitado -->
-                            <span class="badge bg-light text-muted border px-2 py-1" style="font-size: 11px;">
+                            <!-- CORREGIDO: Sincronizada la insignia de Solo Lectura a 14px como los demás módulos -->
+                            <span class="badge bg-light text-muted border px-2 py-1" style="font-size: 14px;">
                                 <i class="bi bi-eye-fill"></i> Solo Lectura
                             </span>
                         @endif
                     </div>
-                </td>  
+                </td>    
             </tr>
         @empty
-            <tr>
-                <td colspan="7" class="text-center text-muted py-4">
+            <tr id="filaVacia" style="display: none;">
+                <td colspan="6" class="text-center text-muted py-4">
                     <i class="bi bi-info-circle fs-4"></i> No hay trabajadores registrados en este momento.
                 </td>
             </tr>
         @endforelse
+        
+        <!-- NUEVO: Fila comodín que se activa si la búsqueda no encuentra coincidencias -->
+        <tr id="filaNoResultados" style="display: none;">
+            <td colspan="6" class="text-center text-muted py-4">
+                <i class="bi bi-search fs-4"></i> No se encontraron trabajadores que coincidan con la búsqueda.
+            </td>
+        </tr>
     </tbody>
 </table>
+
+<!-- LÓGICA DE BÚSQUEDA EN TIEMPO REAL -->
+<script>
+    document.getElementById('inputBuscarTrabajador').addEventListener('keyup', function() {
+        const textoBusqueda = this.value.toLowerCase().trim();
+        const filas = document.querySelectorAll('#tablaTrabajadores tr:not(#filaNoResultados):not(#filaVacia)');
+        let coincidencias = 0;
+
+        filas.forEach(fila => {
+            // Evaluamos todo el texto contenido en la fila (ID, Nombre, Puesto, etc.)
+            const contenidoFila = fila.textContent.toLowerCase();
+            
+            if (contenidoFila.includes(textoBusqueda)) {
+                fila.style.display = '';
+                coincidencias++;
+            } else {
+                fila.style.display = 'none';
+            }
+        });
+
+        // Si no hay resultados que coincidan, mostramos el mensaje de advertencia
+        const filaMensaje = document.getElementById('filaNoResultados');
+        if (coincidencias === 0 && filas.length > 0) {
+            filaMensaje.style.display = '';
+        } else {
+            filaMensaje.style.display = 'none';
+        }
+    });
+</script>
 
 @endsection

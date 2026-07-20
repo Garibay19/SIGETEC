@@ -15,9 +15,10 @@
 </div>
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <input type="text" class="form-control w-50" placeholder="Buscar maquinaria...">
+    <!-- CORREGIDO: Se añadió el id="inputBuscarMaquina" para capturar el texto en tiempo real -->
+    <input type="text" id="inputBuscarMaquina" class="form-control w-50" placeholder="Buscar maquinaria por nombre, marca, modelo o estado...">
     
-    <!-- CORREGIDO: El rol de Invitado no puede ver el botón para crear nueva maquinaria -->
+    <!-- El rol de Invitado no puede ver el botón para crear nueva maquinaria -->
     @if(auth()->user()?->role !== 'Invitado')
         <a href="/maquinaria/create" class="btn btn-warning">
             <i class="bi bi-gear-fill"></i> Nueva Máquina 
@@ -38,7 +39,8 @@
                 <th>Acciones</th>
             </tr>
         </thead>
-        <tbody>
+        <!-- CORREGIDO: Se añadió el id="tablaMaquinaria" para que JavaScript escanee las filas -->
+        <tbody id="tablaMaquinaria">
             <!-- Ciclo dinámico conectado a la Base de Datos de MySQL -->
             @forelse($maquinarias as $maquina)
                 <tr>
@@ -61,12 +63,10 @@
                         <div class="d-flex gap-2 justify-content-center">
                             <!-- Verificación de rol para bloquear acciones al rol Invitado -->
                             @if(auth()->user()?->role !== 'Invitado')
-                                <!-- CORREGIDO: Ajustado el parámetro a 'id' de acuerdo a tu routes/web.php -->
                                 <a href="{{ route('maquinaria.edit', ['id' => $maquina->id_maquinaria]) }}" class="btn btn-warning btn-sm">
                                     <i class="bi bi-pencil-fill"></i> Editar
                                 </a>
         
-                                <!-- CORREGIDO: Ajustado el parámetro a 'id' en el formulario seguro de eliminación -->
                                 <form action="{{ route('maquinaria.destroy', ['id' => $maquina->id_maquinaria]) }}" method="POST" onsubmit="return confirm('¿Está seguro de eliminar esta máquina del registro? Esta acción no se puede deshacer.');" style="display:inline;">
                                     @csrf
                                     @method('DELETE')
@@ -75,7 +75,6 @@
                                     </button>
                                 </form>
                             @else
-                                <!-- CORREGIDO: Ajustada la insignia con el estilo unificado de 14px -->
                                 <span class="badge bg-light text-muted border px-2 py-1" style="font-size: 14px;">
                                     <i class="bi bi-eye-fill"></i> Solo Lectura
                                 </span>
@@ -84,14 +83,48 @@
                     </td>  
                 </tr>
             @empty
-                <tr>
+                <tr id="filaVacia" style="display: none;">
                     <td colspan="7" class="text-center text-muted py-4">
                         <i class="bi bi-info-circle fs-4"></i> No hay maquinaria o equipos registrados en este momento.
                     </td>
                 </tr>
             @endforelse
+            
+            <!-- NUEVO: Fila comodín que se activa si la búsqueda no encuentra ningún resultado -->
+            <tr id="filaNoResultados" style="display: none;">
+                <td colspan="7" class="text-center text-muted py-4">
+                    <i class="bi bi-search fs-4"></i> No se encontraron equipos que coincidan con la búsqueda.
+                </td>
+            </tr>
         </tbody>
     </table>
 </div>
+
+<!-- LÓGICA DE BÚSQUEDA FLUIDA EN TIEMPO REAL -->
+<script>
+    document.getElementById('inputBuscarMaquina').addEventListener('keyup', function() {
+        const textoBusqueda = this.value.toLowerCase().trim();
+        const filas = document.querySelectorAll('#tablaMaquinaria tr:not(#filaNoResultados):not(#filaVacia)');
+        let coincidencias = 0;
+
+        filas.forEach(fila => {
+            const contenidoFila = fila.textContent.toLowerCase();
+            
+            if (contenidoFila.includes(textoBusqueda)) {
+                fila.style.display = '';
+                coincidencias++;
+            } else {
+                fila.style.display = 'none';
+            }
+        });
+
+        const filaMensaje = document.getElementById('filaNoResultados');
+        if (coincidencias === 0 && filas.length > 0) {
+            filaMensaje.style.display = '';
+        } else {
+            filaMensaje.style.display = 'none';
+        }
+    });
+</script>
 
 @endsection

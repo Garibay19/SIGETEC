@@ -15,9 +15,10 @@
 </div>
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <input type="text" class="form-control w-50" placeholder="Buscar cliente...">
+    <!-- CORREGIDO: Se añadió el id="inputBuscar" para poder capturar el texto en tiempo real -->
+    <input type="text" id="inputBuscar" class="form-control w-50" placeholder="Buscar cliente por nombre, teléfono o correo...">
     
-    <!-- CORREGIDO: El rol de Invitado no puede ver el botón para crear nuevos clientes -->
+    <!-- El rol de Invitado no puede ver el botón para crear nuevos clientes -->
     @if(auth()->user()?->role !== 'Invitado')
         <a href="/clientes/create" class="btn btn-warning">
             <i class="bi bi-people-fill"></i>
@@ -37,12 +38,13 @@
             <th>Acciones</th>
         </tr>
     </thead>
-    <tbody>
+    <!-- CORREGIDO: Se añadió el id="tablaClientes" para que JavaScript pueda escanear las filas -->
+    <tbody id="tablaClientes">
         <!-- Ciclo dinámico para recorrer los clientes reales -->
         @forelse($clientes as $cliente)
             <tr>
                 <td>{{ $cliente->id_cliente }}</td>
-                <td class="text-start">{{ $cliente->nombre_completo }}</td>
+                <td class="text-start nombre-cliente">{{ $cliente->nombre_completo }}</td>
                 <td>{{ $cliente->telefono ?? 'N/A' }}</td>
                 <td>{{ $cliente->direccion ?? 'N/A' }}</td>
                 <td>{{ $cliente->correo ?? 'N/A' }}</td>
@@ -50,12 +52,10 @@
                     <div class="d-flex gap-2 justify-content-center">
                         <!-- Verificación de rol para bloquear acciones al rol Invitado -->
                         @if(auth()->user()?->role !== 'Invitado')
-                            <!-- CORREGIDO: Ajustado el parámetro a 'id' de acuerdo a tu routes/web.php -->
                             <a href="{{ route('clientes.edit', ['id' => $cliente->id_cliente]) }}" class="btn btn-warning btn-sm">
                                 <i class="bi bi-pencil-fill"></i> Editar
                             </a>
 
-                            <!-- CORREGIDO: Ajustado el parámetro a 'id' en el formulario seguro de eliminación -->
                             <form action="{{ route('clientes.destroy', ['id' => $cliente->id_cliente]) }}" method="POST" onsubmit="return confirm('¿Está seguro de eliminar este registro? Esta acción borrará también sus pedidos asociados.');" style="display:inline;">
                                 @csrf
                                 @method('DELETE')
@@ -64,7 +64,6 @@
                                 </button>
                             </form>
                         @else
-                            <!-- CORREGIDO: Ajustada la insignia con el estilo exacto de tu Historial de Pagos -->
                             <span class="badge bg-light text-muted border px-2 py-1" style="font-size: 14px;">
                                 <i class="bi bi-eye-fill"></i> Solo Lectura
                             </span>
@@ -73,13 +72,49 @@
                 </td>    
             </tr>
         @empty
-            <tr>
+            <tr id="filaVacia" style="display: none;">
                 <td colspan="6" class="text-center text-muted py-4">
                     <i class="bi bi-info-circle fs-4"></i> No hay clientes registrados en este momento.
                 </td>
             </tr>
         @endforelse
+        
+        <!-- NUEVO: Fila comodín que se activa si la búsqueda no encuentra ningún resultado -->
+        <tr id="filaNoResultados" style="display: none;">
+            <td colspan="6" class="text-center text-muted py-4">
+                <i class="bi bi-search fs-4"></i> No se encontraron clientes que coincidan con la búsqueda.
+            </td>
+        </tr>
     </tbody>
 </table>
+
+<!-- LÓGICA DE BÚSQUEDA FLUIDA EN TIEMPO REAL -->
+<script>
+    document.getElementById('inputBuscar').addEventListener('keyup', function() {
+        const textoBusqueda = this.value.toLowerCase().trim();
+        const filas = document.querySelectorAll('#tablaClientes tr:not(#filaNoResultados):not(#filaVacia)');
+        let coincidencias = 0;
+
+        filas.forEach(filas => {
+            // Evaluamos todo el contenido de texto de la fila (Nombre, Teléfono, Correo, etc.)
+            const contenidoFila = filas.textContent.toLowerCase();
+            
+            if (contenidoFila.includes(textoBusqueda)) {
+                filas.style.display = '';
+                coincidencias++;
+            } else {
+                filas.style.display = 'none';
+            }
+        });
+
+        // Si no hay ningún cliente que coincida, mostramos el mensaje de advertencia
+        const filaMensaje = document.getElementById('filaNoResultados');
+        if (coincidencias === 0 && filas.length > 0) {
+            filaMensaje.style.display = '';
+        } else {
+            filaMensaje.style.display = 'none';
+        }
+    });
+</script>
 
 @endsection

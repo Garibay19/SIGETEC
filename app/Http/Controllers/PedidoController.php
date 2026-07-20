@@ -8,88 +8,91 @@ use Illuminate\Http\Request;
 
 class PedidoController extends Controller
 {
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        $pedidos = Pedido::with('cliente')->get();
+        return view('pedidos.index', compact('pedidos'));
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
     public function store(Request $request)
     {
-        // 1. Validamos los datos recibidos del formulario de pedidos
+        // 1. Validamos que los datos que vienen del formulario cumplan con las reglas de negocio
         $request->validate([
-            'nombre_cliente' => 'required|string|max:100',
-            'fecha_pedido' => 'required|date',
+            'id_cliente' => 'required|exists:clientes,id_cliente', 
             'descripcion' => 'required|string',
             'fecha_entrega' => 'required|date',
+            'estado' => 'required|string',
             'total' => 'required|numeric|min:0',
-            'estado' => 'required|string|max:50',
+            'saldo_pendiente' => 'required|numeric|min:0',
         ]);
 
-        // 2. BUSCADOR INTELIGENTE PROTEGIDO: Busca si ya existe el cliente por su nombre completo.
-        // Si no existe, lo da de alta inyectando valores por defecto en los campos obligatorios del Frontend.
-        $cliente = Cliente::firstOrCreate(
-            ['nombre_completo' => $request->nombre_cliente],
-            [
-                'telefono' => 'N/A',
-                'correo' => 'sin_correo@ejemplo.com',
-                'direccion' => 'Dirección pendiente',
-                'observaciones' => 'Registrado automáticamente desde el módulo de pedidos.'
-            ]
-        );
-
-        // 3. Registramos el pedido vinculando el ID del cliente encontrado o recién creado
+        // 2. Insertamos el registro de forma real en la tabla de pedidos de MySQL
         Pedido::create([
-            'id_cliente' => $cliente->id_cliente,
-            'fecha_pedido' => $request->fecha_pedido,
+            'id_cliente' => $request->id_cliente,
             'descripcion' => $request->descripcion,
             'fecha_entrega' => $request->fecha_entrega,
+            'estado' => $request->estado,
             'total' => $request->total,
-            'saldo_pendiente' => $request->total, 
-            'estado' => $request->estado
+            'saldo_pendiente' => $request->saldo_pendiente,
+            'fecha_pedido' => date('Y-m-d') 
         ]);
 
-        return redirect('/pedidos')->with('exito', '¡Pedido registrado con éxito!');
+        // 3. Redireccionamos al listado general de pedidos con un mensaje de éxito
+        return redirect('/pedidos')->with('success', '¡El pedido ha sido registrado y enlazado con éxito!');
     }
 
-    public function destroy($id)
-    {
-        $pedido = Pedido::find($id);
-        if ($pedido) {
-            $pedido->delete();
-            return redirect('/pedidos')->with('exito', '¡Pedido eliminado correctamente!');
-        }
-        return redirect('/pedidos')->with('error', 'El pedido no se pudo encontrar.');
-    }
-
-    // Función para mostrar la pantalla de edición con los datos del pedido actual
+    /**
+     * Show the form for editing the specified resource.
+     */
     public function edit($id)
     {
-        $pedido = Pedido::with('cliente')->find($id);
-        if (!$pedido) {
-            return redirect('/pedidos')->with('error', 'Pedido no encontrado.');
-        }
-        return view('pedidos.edit', compact('pedido'));
+        $pedido = Pedido::findOrFail($id);
+        $clientes = Cliente::orderBy('nombre_completo', 'asc')->get();
+        return view('pedidos.edit', compact('pedido', 'clientes'));
     }
 
-    // Función para guardar los cambios modificados en el formulario
+    /**
+     * Update the specified resource in storage.
+     */
     public function update(Request $request, $id)
     {
+        $pedido = Pedido::findOrFail($id);
+
         $request->validate([
-            'fecha_pedido' => 'required|date',
+            'id_cliente' => 'required|exists:clientes,id_cliente',
             'descripcion' => 'required|string',
             'fecha_entrega' => 'required|date',
+            'estado' => 'required|string',
             'total' => 'required|numeric|min:0',
-            'estado' => 'required|string|max:50',
+            'saldo_pendiente' => 'required|numeric|min:0',
         ]);
 
-        $pedido = Pedido::find($id);
-        if ($pedido) {
-            $pedido->update([
-                'fecha_pedido' => $request->fecha_pedido,
-                'descripcion' => $request->descripcion,
-                'fecha_entrega' => $request->fecha_entrega,
-                'total' => $request->total,
-                'saldo_pendiente' => $request->total, // Se recalcula temporalmente con el nuevo total
-                'estado' => $request->estado,
-            ]);
-            return redirect('/pedidos')->with('exito', '¡Pedido actualizado correctamente!');
-        }
+        $pedido->update([
+            'id_cliente' => $request->id_cliente,
+            'descripcion' => $request->descripcion,
+            'fecha_entrega' => $request->fecha_entrega,
+            'estado' => $request->estado,
+            'total' => $request->total,
+            'saldo_pendiente' => $request->saldo_pendiente,
+        ]);
 
-        return redirect('/pedidos')->with('error', 'No se pudo actualizar el pedido.');
+        return redirect('/pedidos')->with('success', '¡Pedido actualizado con éxito!');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy($id)
+    {
+        $pedido = Pedido::findOrFail($id);
+        $pedido->delete();
+
+        return redirect('/pedidos')->with('success', 'Pedido eliminado correctamente.');
     }
 }
