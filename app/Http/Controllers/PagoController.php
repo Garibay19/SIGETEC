@@ -11,9 +11,9 @@ class PagoController extends Controller
     // Registra un pago desde el formulario de creación inicial
     public function store(Request $request)
     {
+        
         $request->validate([
             'id_pedido' => 'required|exists:pedidos,id_pedido',
-            'fecha_pago' => 'required|date',
             'abono' => 'required|numeric|min:0.01',
             'metodo_pago' => 'required|string|max:50',
         ]);
@@ -27,7 +27,7 @@ class PagoController extends Controller
 
         Pago::create([
             'id_pedido' => $pedido->id_pedido,
-            'fecha_pago' => $request->fecha_pago,
+            'fecha_pago' => now(),
             'monto_total_pedido' => $pedido->total,
             'abono' => $request->abono,
             'saldo_restante' => $nuevoSaldoRestante,
